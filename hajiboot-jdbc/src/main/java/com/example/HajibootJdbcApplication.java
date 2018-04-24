@@ -14,33 +14,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @SpringBootApplication
-public class HajibootJdbcApplication implements CommandLineRunner{
+public class HajibootJdbcApplication implements CommandLineRunner {
 
-	//Auto ConfigでDataSourceやNamedParameterなどは設定されている。
-	@Autowired
-	NamedParameterJdbcTemplate jdbcTemplate;
+    //Auto ConfigでDataSourceやNamedParameterなどは設定されている。
+    @Autowired
+    NamedParameterJdbcTemplate jdbcTemplate;
 
-	@Override
-	public void run(String... args) throws Exception {
-		String sql = "SELECT id, first_name, last_name FROM customers WHERE id = :id";
-		SqlParameterSource param = new MapSqlParameterSource()
-				.addValue("id",1);
+    @Override
+    public void run(String... args) throws Exception {
+        String sql = "SELECT id, first_name, last_name FROM customers WHERE id = :id";
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("id", 1);
 
-		Customer result = jdbcTemplate.queryForObject(sql, param, new RowMapper<Customer>(){
-			@Override
-			public Customer mapRow(ResultSet rs, int i) throws SQLException {
-				return new Customer(rs.getInt("id"),rs.getString("first_name"),
-						rs.getString("last_name"));
-			}
-		});
-		System.out.println("result = " + result);
-	}
+        Customer result = jdbcTemplate.queryForObject(sql, param, ((rs, i) ->
+                new Customer(rs.getInt("id"), rs.getString("first_name"),
+                        rs.getString("last_name"))));
+        System.out.println("result = " + result);
+    }
 
 
+    public static void main(String[] args) {
 
-
-	public static void main(String[] args) {
-
-		SpringApplication.run(HajibootJdbcApplication.class, args);
-	}
+        SpringApplication.run(HajibootJdbcApplication.class, args);
+    }
 }
