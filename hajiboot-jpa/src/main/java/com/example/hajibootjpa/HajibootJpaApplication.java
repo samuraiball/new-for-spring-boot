@@ -1,0 +1,12 @@
+package com.example.hajibootjpa;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class HajibootJpaApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(HajibootJpaApplication.class, args);
+	}
+}
