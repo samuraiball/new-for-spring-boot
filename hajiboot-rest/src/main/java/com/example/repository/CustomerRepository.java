@@ -2,14 +2,17 @@ package com.example.repository;
 
 import com.example.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
@@ -19,6 +22,18 @@ import java.util.List;
 public class CustomerRepository {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
+
+    SimpleJdbcInsert insert;
+
+    @PostConstruct
+    public void init() {
+        //JdbcTemplateをSimpleJdbcInsertに設定するしなければならない。
+        insert = new SimpleJdbcInsert((JdbcTemplate) jdbcTemplate.getJdbcOperations())
+                //Insert文を自動生成させるためにテーブル名を指定
+                .withTableName("customers")
+                //自動採番される主キーを選択
+                .usingGeneratedKeyColumns("id");
+    }
 
     private static final RowMapper<Customer> customerRowMapper = (rs, i) -> {
         Integer id = rs.getInt("id");
@@ -45,16 +60,17 @@ public class CustomerRepository {
         //BeanPropertySqlParameterSourceはフィールド名と値をマッピングしたSqlParameterSourceを作成する
         SqlParameterSource param = new BeanPropertySqlParameterSource(customer);
         if (customer.getId() == null) {
-            jdbcTemplate.update("INSERT INTO customers(first_name,last_name) values(:firstName,:lastName)",
-                    param);
+            //自動採番された主キーが返却される。
+            Number key = insert.executeAndReturnKey(param);
+            customer.setId(key.intValue());
         } else {
-            jdbcTemplate.update("UPDATE customers SET first_name=:firstName, last_name =:lastName WHERE id=:id",param);
+            jdbcTemplate.update("UPDATE customers SET first_name=:firstName, last_name =:lastName WHERE id=:id", param);
         }
         return customer;
     }
 
-    public void delete(Integer id){
-        SqlParameterSource param = new MapSqlParameterSource().addValue("id",id);
-        jdbcTemplate.update("DELETE FROM customers WHERE id=:id",param);
+    public void delete(Integer id) {
+        SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
+        jdbcTemplate.update("DELETE FROM customers WHERE id=:id", param);
     }
 }
