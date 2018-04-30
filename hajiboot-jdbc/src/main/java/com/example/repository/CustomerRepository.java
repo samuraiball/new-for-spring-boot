@@ -36,7 +36,7 @@ public class CustomerRepository {
 
     public Customer findOne(Integer id) {
         SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
-        return jdbcTemplate.queryForObject("SELECT id, first_name, last_name FROM customer WHERE id=:id",
+        return jdbcTemplate.queryForObject("SELECT id, first_name, last_name FROM customers WHERE id=:id",
                 param,
                 customerRowMapper);
     }
