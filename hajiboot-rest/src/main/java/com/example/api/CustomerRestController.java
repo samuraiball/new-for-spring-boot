@@ -4,8 +4,11 @@ import com.example.domain.Customer;
 import com.example.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,9 +31,11 @@ public class CustomerRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Customer postCustomer(@RequestBody Customer customer) {
-        System.out.println("aaaa");
-        return customerService.create(customer);
+    ResponseEntity<Customer> postCustomer(@RequestBody Customer customer, UriComponentsBuilder uriBuilder) {
+
+        Customer csutomer = customerService.create(customer);
+        URI location = uriBuilder.path("api/customers/{id}").buildAndExpand(customer.getId()).toUri();
+        return ResponseEntity.created(location).body(customer);
     }
 
     @PutMapping(path = "{id}")
