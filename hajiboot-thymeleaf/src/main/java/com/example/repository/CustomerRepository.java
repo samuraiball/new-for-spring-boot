@@ -1,6 +1,8 @@
+/*
 package com.example.repository;
 
 import com.example.domain.Customer;
+import com.example.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -39,7 +41,7 @@ public class CustomerRepository {
         Integer id = rs.getInt("id");
         String firstName = rs.getString("first_name");
         String lastName = rs.getString("last_name");
-        return new Customer(id, firstName, lastName);
+        return new Customer(id, firstName, lastName,username);
     };
 
     public List<Customer> findAll() {
@@ -74,3 +76,4 @@ public class CustomerRepository {
         jdbcTemplate.update("DELETE FROM customers WHERE id=:id", param);
     }
 }
+*/

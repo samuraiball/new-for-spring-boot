@@ -1,9 +1,13 @@
 package com.example.web;
 
 import com.example.domain.Customer;
+import com.example.domain.User;
 import com.example.service.CustomerService;
+import com.example.service.LoginUserDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,7 +39,9 @@ public class CustomerController {
 
     @PostMapping(path = "create")
         //Validatedアノテーションが評価された後に隣のBindingResultに結果が格納される。
-    String create(@Validated CustomerForm form, BindingResult result, Model model) {
+    String create(@Validated CustomerForm form, BindingResult result, Model model,
+                  @AuthenticationPrincipal LoginUserDetails userDetails) {
+
         if (result.hasErrors()) {
             return list(model);
         }
@@ -44,33 +50,34 @@ public class CustomerController {
         //フィールド名が同じものの場合につかえるBean変換
         //より柔軟なものにはDozerやModelMapperが存在する。
         BeanUtils.copyProperties(form, customer);
-        customerService.create(customer);
+        customerService.create(customer, userDetails.getUser());
         return "redirect:/customers";
     }
 
     @GetMapping(path = "edit", params = "form")
-    String edit(@RequestParam Integer id, CustomerForm form ) {
+    String edit(@RequestParam Integer id, CustomerForm form) {
         Customer customer = customerService.findOne(id);
-        BeanUtils.copyProperties(customer,form);
+        BeanUtils.copyProperties(customer, form);
         return "customers/edit";
     }
 
     @PostMapping(path = "edit")
-    String editForm(@RequestParam Integer id, @Validated CustomerForm form){
+    String editForm(@RequestParam Integer id, @Validated CustomerForm form,
+                    @AuthenticationPrincipal LoginUserDetails userDetails) {
         Customer customer = customerService.findOne(id);
-        BeanUtils.copyProperties(form,customer);
+        BeanUtils.copyProperties(form, customer);
         customer.setId(id);
-        customerService.update(customer);
+        customerService.update(customer,userDetails.getUser());
         return "redirect:/customers";
     }
 
-    @PostMapping(path="edit", params = "goToTop")
-    String goToTop(){
+    @PostMapping(path = "edit", params = "goToTop")
+    String goToTop() {
         return "redirect:/customers";
     }
 
     @PostMapping(path = "delete")
-    String delete(@RequestParam Integer id){
+    String delete(@RequestParam Integer id) {
         customerService.delete(id);
         return "redirect:/customers";
     }
