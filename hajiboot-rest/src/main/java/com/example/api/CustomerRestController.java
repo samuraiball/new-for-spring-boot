@@ -1,6 +1,7 @@
 package com.example.api;
 
 import com.example.domain.Customer;
+import com.example.service.CustomerService;
 import com.example.service.CustomerServiceWithJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,21 +20,26 @@ import java.util.List;
 public class CustomerRestController {
 
     @Autowired
-    CustomerServiceWithJPA customerService;
+    CustomerService customerService;
 
     //GetMappingでは返り値がJson型にシリアライズ化されてHTTPボディに格納される。
-    @GetMapping
+    //@GetMapping
     //@PageableDefaultはページ指定がなかった場合、「page」と「size」のデフォルトを設定している。
     //default page=0 size= 20
     //パラメータは0始まり
-    Page<Customer> getCustomers(@PageableDefault Pageable pageable) {
-        return customerService.findAll(pageable);
+//    Page<Customer> getCustomers(@PageableDefault Pageable pageable) {
+//        return customerService.findAll(pageable);
+//    }
+
+
+    @GetMapping
+    List<Customer> getCustomers() {
+        return customerService.findAll();
     }
 
     @GetMapping(path = "{id}")
     Customer getCustomer(@PathVariable Integer id) {
-        //  return customerService.findOne(id);
-        return null;
+        return customerService.findOne(id);
     }
 
     @PostMapping
@@ -54,6 +60,6 @@ public class CustomerRestController {
     @DeleteMapping(path = "{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteCustomer(@PathVariable Integer id) {
-        // customerService.delete(id);
+        customerService.delete(id);
     }
 }
