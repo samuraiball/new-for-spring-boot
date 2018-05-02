@@ -23,7 +23,7 @@ public class Customer implements Serializable {
 
     private String lastName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "username")
     private User user;
 }

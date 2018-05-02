@@ -28,8 +28,7 @@ public class User {
 
     @JsonIgnore
     //「cascade= CascadeType.ALL」Userのデータに対する操作をCustomerの方にも伝播させることができる。例えばUserを削除すると関連するCustomerも削除される。
-    //「fetch = FetchType.LAZY」を有効にすることで関連するエンティティを「遅延ロード」させることができる。
-    //本当に必要になったときにCustomerがロードされる。
-    @OneToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    //「fetch = FetchType.LAZY」を有効にすることで関連するエンティティを「遅延ロード」させることができる。本当に必要になったときにCustomerがロードされる。
+    @OneToMany(cascade= CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private List<Customer> customers;
 }
